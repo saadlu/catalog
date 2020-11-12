@@ -72,6 +72,10 @@ spec:
       description: the image used where the git-init binary is
       type: string
       default: "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.18.0"
+    - name: sshPrivateKey
+      description: the private key to use
+      type: string
+      default: ""
   results:
     - name: commit
       description: The precise commit SHA that was fetched by this Task
@@ -86,6 +90,11 @@ spec:
 
         if [[ "$(params.verbose)" == "true" ]] ; then
           set -x
+        fi
+
+        if [[ "$(params.sshPrivateKey)" != "" ]] ; then
+          eval `ssh-agent`
+          ssh-add ~/.ssh/$(params.sshPrivateKey)
         fi
 
         CHECKOUT_DIR="$(workspaces.output.path)/$(params.subdirectory)"
